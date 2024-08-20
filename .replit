@@ -1,7 +1,7 @@
 entrypoint = "README.md"
 modules = ["nodejs-20"]
 hidden = [".config", "package-lock.json"]
-run = ["sh", "-c", "npm run dev"]
+run = ["sh", "-c", "npm --prefix backend run dev & npm --prefix frontend run dev"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
@@ -15,8 +15,12 @@ language = "nodejs"
 [deployment]
 deploymentTarget = "static"
 ignorePorts = false
-build = ["sh", "-c", "npm run build"]
-publicDir = "dist"
+build = ["sh", "-c", "npm --prefix frontend run build"]
+publicDir = "frontend/dist"
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
 
 [[ports]]
 localPort = 5173

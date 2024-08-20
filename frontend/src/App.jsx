@@ -1,36 +1,42 @@
-// src/App.jsx
-import React, { useState, useCallback } from 'react';
-import Layout from './components/Layout';
-import YouTubeInput from './components/YouTubeInput';
-import VideoPreview from './components/VideoPreview';
-import KeywordSearch from './components/KeywordSearch';
-import SearchResults from './components/SearchResults';
-import { Card, CardContent } from './components/ui/card';
+import React, { useState, useCallback } from "react";
+import Layout from "./components/Layout";
+import YouTubeInput from "./components/YouTubeInput";
+import VideoPreview from "./components/VideoPreview";
+import KeywordSearch from "./components/KeywordSearch";
+import SearchResults from "./components/SearchResults";
+import { Card, CardContent } from "./components/ui/card";
 
 function App() {
-  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [transcription, setTranscription] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
   const handleUrlChange = useCallback((url) => {
     setYoutubeUrl(url);
   }, []);
 
-  const handleTranscribe = (url) => {
-    console.log('Transcribing:', url);
-    // Here you would typically call your backend API to transcribe the video
+  const handleTranscribe = (transcriptionText) => {
+    setTranscription(transcriptionText);
   };
 
   const handleSearch = (keyword) => {
-    console.log('Searching for:', keyword);
-    // Here you would typically call your backend API to search the transcription
-    setSearchResults([
-      {
-        timeframe: '00:01:30',
-        sentence: `This is a sentence containing the keyword "${keyword}"`,
-        url: `${youtubeUrl}&t=90`,
-      },
-      // Add more dummy results as needed
-    ]);
+    if (!transcription) {
+      console.log("No transcription available");
+      return;
+    }
+
+    const lines = transcription.split("\n");
+    const results = lines.filter((line) =>
+      line.toLowerCase().includes(keyword.toLowerCase()),
+    );
+
+    setSearchResults(
+      results.map((sentence, index) => ({
+        timeframe: `00:${index}:00`, // Placeholder timeframe
+        sentence,
+        url: `${youtubeUrl}&t=${index * 60}`, // Placeholder timestamp
+      })),
+    );
   };
 
   return (
@@ -40,7 +46,10 @@ function App() {
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
-                <YouTubeInput onUrlChange={handleUrlChange} onTranscribe={handleTranscribe} />
+                <YouTubeInput
+                  onUrlChange={handleUrlChange}
+                  onTranscribe={handleTranscribe}
+                />
                 <KeywordSearch onSearch={handleSearch} />
               </div>
               <div className="flex items-center justify-center">
